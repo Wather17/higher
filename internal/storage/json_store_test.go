@@ -3,6 +3,7 @@ package storage
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -39,12 +40,14 @@ func TestStoreSaveAndLoadRoundTrip(t *testing.T) {
 		t.Fatalf("unexpected loaded document: %+v", loaded)
 	}
 
-	info, err := os.Stat(store.Path())
-	if err != nil {
-		t.Fatalf("stat store: %v", err)
-	}
-	if info.Mode().Perm() != 0o600 {
-		t.Fatalf("expected private file permissions, got %o", info.Mode().Perm())
+	if runtime.GOOS != "windows" {
+		info, err := os.Stat(store.Path())
+		if err != nil {
+			t.Fatalf("stat store: %v", err)
+		}
+		if info.Mode().Perm() != 0o600 {
+			t.Fatalf("expected private file permissions, got %o", info.Mode().Perm())
+		}
 	}
 }
 
