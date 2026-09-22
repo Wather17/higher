@@ -32,7 +32,7 @@ func NewRootCommand(dependencies ...Dependencies) *cobra.Command {
 			return command.Help()
 		},
 	}
-	command.AddCommand(newSubscriptionCommand(dependency))
+	command.AddCommand(newVersionCommand(), newSubscriptionCommand(dependency))
 
 	return command
 }

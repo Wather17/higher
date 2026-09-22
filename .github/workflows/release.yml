@@ -1,0 +1,68 @@
+name: Release Higher
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Validate, build, and publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.x'
+          cache: true
+
+      - name: Validate stable version tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          if [[ ! "$TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "Only stable vMAJOR.MINOR.PATCH tags are supported: ${TAG}" >&2
+            exit 1
+          fi
+
+      - name: Test
+        run: go test ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Build release binaries
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          ./scripts/build.sh "$version"
+          output="$(./dist/higher-linux-amd64 version)"
+          expected_prefix="Higher v${version} "
+          if [[ "$output" != "$expected_prefix"* ]]; then
+            echo "Unexpected version output: ${output}" >&2
+            exit 1
+          fi
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Higher ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            dist/higher-linux-amd64
+            dist/higher-linux-arm64
+            dist/higher-windows-amd64.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

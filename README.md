@@ -8,13 +8,19 @@ Higher é um CLI pessoal de gestão financeira, escrito em Go. A primeira funcio
 go test ./...
 go vet ./...
 go build ./...
+./scripts/build.sh dev
 ```
+
+O comando `higher version` informa a versão, o commit e a data UTC embutidos no binário.
+O fluxo de tags e publicação está descrito em [docs/RELEASES.md](docs/RELEASES.md).
 
 ## Assinaturas
 
 Os valores usam ponto decimal e a moeda padrão é BRL. O CLI também suporta USD, mantendo os totais separados.
 
 ```bash
+go run ./cmd/higher version
+
 go run ./cmd/higher subscription add \
   --name "Netflix" \
   --amount 55.90 \

@@ -36,3 +36,29 @@ jobs:
 
       - name: Build
         run: go build ./...
+
+  cross-build:
+    name: Verify release targets
+    needs: validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.x'
+          cache: true
+
+      - name: Cross-build release binaries
+        run: ./scripts/build.sh dev
+
+      - name: Verify embedded development version
+        run: |
+          output="$(./dist/higher-linux-amd64 version)"
+          if [[ "$output" != "Higher dev (commit "* ]]; then
+            echo "Unexpected version output: ${output}" >&2
+            exit 1
+          fi

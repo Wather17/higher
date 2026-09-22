@@ -29,3 +29,35 @@ func TestNewRootCommandRejectsUnknownCommand(t *testing.T) {
 		t.Fatal("expected unknown command to fail")
 	}
 }
+
+func TestVersionCommandDisplaysDevelopmentDefaults(t *testing.T) {
+	previousVersion, previousCommit, previousBuildDate := Version, Commit, BuildDate
+	Version, Commit, BuildDate = "dev", "none", "unknown"
+	t.Cleanup(func() {
+		Version, Commit, BuildDate = previousVersion, previousCommit, previousBuildDate
+	})
+
+	output, err := executeRoot(NewRootCommand(), "version")
+	if err != nil {
+		t.Fatalf("executing version command: %v", err)
+	}
+	if output != "Higher dev (commit none, build unknown)\n" {
+		t.Fatalf("unexpected version output: %q", output)
+	}
+}
+
+func TestVersionCommandDisplaysBuildMetadata(t *testing.T) {
+	previousVersion, previousCommit, previousBuildDate := Version, Commit, BuildDate
+	Version, Commit, BuildDate = "1.2.3", "abc1234", "2026-09-22T12:34:56Z"
+	t.Cleanup(func() {
+		Version, Commit, BuildDate = previousVersion, previousCommit, previousBuildDate
+	})
+
+	output, err := executeRoot(NewRootCommand(), "version")
+	if err != nil {
+		t.Fatalf("executing version command: %v", err)
+	}
+	if output != "Higher v1.2.3 (commit abc1234, build 2026-09-22T12:34:56Z)\n" {
+		t.Fatalf("unexpected version output: %q", output)
+	}
+}
