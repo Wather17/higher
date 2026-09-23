@@ -29,3 +29,14 @@ func TestNewRootCommandRejectsUnknownCommand(t *testing.T) {
 		t.Fatal("expected unknown command to fail")
 	}
 }
+
+func TestNewRootCommandIncludesReserveCommand(t *testing.T) {
+	command := NewRootCommand()
+	reserveCommand, _, err := command.Find([]string{"reserve"})
+	if err != nil {
+		t.Fatalf("finding reserve command: %v", err)
+	}
+	if reserveCommand == nil || reserveCommand.Use != "reserve" {
+		t.Fatalf("unexpected reserve command: %+v", reserveCommand)
+	}
+}
