@@ -8,8 +8,9 @@ import (
 )
 
 type Dependencies struct {
-	Store *storage.Store
-	Now   func() time.Time
+	Store        *storage.Store
+	ReserveStore *storage.ReserveStore
+	Now          func() time.Time
 }
 
 // NewRootCommand creates the root command for the Higher CLI.
@@ -32,7 +33,11 @@ func NewRootCommand(dependencies ...Dependencies) *cobra.Command {
 			return command.Help()
 		},
 	}
-	command.AddCommand(newVersionCommand(), newSubscriptionCommand(dependency))
+	command.AddCommand(
+		newVersionCommand(),
+		newSubscriptionCommand(dependency),
+		newReserveCommand(dependency),
+	)
 
 	return command
 }

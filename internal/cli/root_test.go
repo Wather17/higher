@@ -61,3 +61,14 @@ func TestVersionCommandDisplaysBuildMetadata(t *testing.T) {
 		t.Fatalf("unexpected version output: %q", output)
 	}
 }
+
+func TestNewRootCommandIncludesReserveCommand(t *testing.T) {
+	command := NewRootCommand()
+	reserveCommand, _, err := command.Find([]string{"reserve"})
+	if err != nil {
+		t.Fatalf("finding reserve command: %v", err)
+	}
+	if reserveCommand == nil || reserveCommand.Use != "reserve" {
+		t.Fatalf("unexpected reserve command: %+v", reserveCommand)
+	}
+}

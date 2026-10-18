@@ -5,6 +5,7 @@ AGENTS.md
 .agents/skills/refine-issues/SKILL.md
 .agents/skills/autonomous-batch/SKILL.md
 # Synced GitHub issues
+tests/
 issues/
 
 # Cross-platform build outputs
